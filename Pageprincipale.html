@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechShop - Matériel informatique</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f4f6f8; color: #222; }
+
+    header {
+      background: #0f172a; color: white;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 32px; position: sticky; top: 0; z-index: 10;
+    }
+    header h1 { font-size: 24px; }
+    header nav a { color: white; text-decoration: none; margin: 0 12px; }
+    header nav a:hover { color: #38bdf8; }
+    #bouton-panier {
+      background: #38bdf8; color: #0f172a; border: none;
+      padding: 10px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;
+    }
+
+    .banniere {
+      background: linear-gradient(135deg, #1e3a8a, #38bdf8);
+      color: white; text-align: center; padding: 80px 20px;
+    }
+    .banniere h2 { font-size: 40px; margin-bottom: 12px; }
+    .banniere p { font-size: 18px; margin-bottom: 24px; }
+    .banniere a {
+      background: white; color: #1e3a8a; padding: 12px 24px;
+      border-radius: 6px; text-decoration: none; font-weight: bold;
+    }
+
+    .conteneur { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+    .conteneur h2 { margin-bottom: 20px; }
+
+    .filtres { margin-bottom: 24px; }
+    .filtres button {
+      background: white; border: 1px solid #cbd5e1; padding: 8px 14px;
+      margin-right: 8px; border-radius: 20px; cursor: pointer;
+    }
+    .filtres button.actif { background: #0f172a; color: white; }
+
+    .grille {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 24px;
+    }
+    .carte {
+      background: white; border-radius: 10px; padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
+    }
+    .carte .emoji { font-size: 64px; margin-bottom: 12px; }
+    .carte h3 { font-size: 18px; margin-bottom: 8px; }
+    .carte .prix { color: #1e3a8a; font-weight: bold; font-size: 20px; margin-bottom: 12px; }
+    .carte button {
+      background: #0f172a; color: white; border: none;
+      padding: 10px 16px; border-radius: 6px; cursor: pointer; width: 100%;
+    }
+    .carte button:hover { background: #1e3a8a; }
+
+    #panier {
+      position: fixed; top: 0; right: -380px; width: 360px; height: 100%;
+      background: white; box-shadow: -4px 0 12px rgba(0,0,0,0.2);
+      padding: 24px; transition: right 0.3s; overflow-y: auto; z-index: 20;
+    }
+    #panier.ouvert { right: 0; }
+    #panier h2 { margin-bottom: 16px; }
+    .ligne-panier {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid #e2e8f0;
+    }
+    .ligne-panier button {
+      background: #ef4444; color: white; border: none;
+      border-radius: 4px; padding: 4px 8px; cursor: pointer;
+    }
+    #total { margin: 20px 0; font-size: 20px; font-weight: bold; }
+    #commander {
+      background: #16a34a; color: white; border: none; width: 100%;
+      padding: 12px; border-radius: 6px; font-size: 16px; cursor: pointer;
+    }
+    #fermer { float: right; background: none; border: none; font-size: 24px; cursor: pointer; }
+
+    #formulaire { margin-top: 16px; }
+    #formulaire.cache { display: none; }
+    #formulaire input, #formulaire select {
+      width: 100%; padding: 10px; margin-bottom: 10px;
+      border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px;
+    }
+    #info-paiement {
+      background: #f1f5f9; padding: 10px; border-radius: 6px;
+      margin-bottom: 10px; font-size: 14px; line-height: 1.5;
+    }
+    #retour { background: none; border: none; color: #1e3a8a; cursor: pointer; margin-bottom: 10px; }
+
+    /* Adaptation aux téléphones Android et petits écrans */
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    button, input, select { font-family: inherit; -webkit-appearance: none; appearance: none; }
+    #formulaire select { background: white; }
+    @media (max-width: 768px) {
+      header { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+      header h1 { font-size: 20px; }
+      header nav { order: 3; width: 100%; text-align: center; }
+      header nav a { margin: 0 8px; font-size: 14px; }
+      .banniere { padding: 50px 16px; }
+      .banniere h2 { font-size: 26px; }
+      .banniere p { font-size: 16px; }
+      .conteneur { margin: 24px auto; padding: 0 12px; }
+      .filtres { white-space: nowrap; overflow-x: auto; padding-bottom: 6px; }
+      .grille { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .carte { padding: 12px; }
+      .carte .emoji { font-size: 44px; }
+      .carte h3 { font-size: 14px; }
+      .carte .prix { font-size: 15px; }
+      .carte button { padding: 12px 8px; font-size: 13px; }
+      #panier { width: 100%; right: -100%; }
+      #formulaire input, #formulaire select { font-size: 16px; }
+    }
+    @media (max-width: 380px) {
+      .grille { grid-template-columns: 1fr; }
+    }
+
+    footer {
+      background: #0f172a; color: #cbd5e1; text-align: center;
+      padding: 32px 20px; margin-top: 60px;
+    }
+    footer p { margin: 6px 0; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>💻 TechShop</h1>
+    <nav>
+      <a href="#accueil">Accueil</a>
+      <a href="#produits">Produits</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button id="bouton-panier">🛒 Panier (<span id="compteur">0</span>)</button>
+  </header>
+
+  <section class="banniere" id="accueil">
+    <h2>Le meilleur du matériel informatique</h2>
+    <p>Ordinateurs, composants et accessoires au meilleur prix.</p>
+    <a href="#produits">Voir les produits</a>
+  </section>
+
+  <main class="conteneur" id="produits">
+    <h2>Nos produits</h2>
+    <div class="filtres" id="filtres"></div>
+    <div class="grille" id="grille"></div>
+  </main>
+
+  <aside id="panier">
+    <button id="fermer">×</button>
+    <h2>Votre panier</h2>
+    <div id="liste-panier"></div>
+    <div id="total">Total : 0 FCFA</div>
+    <button id="commander">Commander</button>
+
+    <div id="formulaire" class="cache">
+      <button id="retour">← Retour au panier</button>
+      <input type="text" id="nom-client" placeholder="Votre nom complet">
+      <input type="tel" id="tel-client" placeholder="Votre numéro de téléphone">
+      <input type="text" id="adresse-client" placeholder="Adresse de livraison">
+      <select id="moyen-paiement">
+        <option value="">Choisir le moyen de paiement</option>
+        <option value="Orange Money">Orange Money</option>
+        <option value="Moov Money">Moov Money</option>
+        <option value="MTN Money">MTN Money</option>
+        <option value="Wave">Wave</option>
+        <option value="Paiement à la livraison">Paiement à la livraison</option>
+      </select>
+      <div id="info-paiement"></div>
+      <button id="confirmer">Confirmer la commande</button>
+    </div>
+  </aside>
+
+  <footer id="contact">
+    <p><strong>TechShop</strong> - Votre boutique de matériel informatique</p>
+    <p>Email : yougoneto@gmail.com · Téléphone : 05 74 27 43 22 / 07 12 42 35 49</p>
+    <p>© 2026 TechShop. Tous droits réservés.</p>
+  </footer>
+
+  <script>
+    // Liste des produits : modifie-la pour mettre les tiens
+    const produits = [
+      { id: 1, nom: "Ordinateur portable Lenovo", prix: 250000, categorie: "Ordinateurs portables", emoji: "💻" },
+      { id: 2, nom: "Ordinateur portable HP", prix: 375000, categorie: "Ordinateurs portables", emoji: "💻" },
+      { id: 3, nom: "PC de bureau HP", prix: 215000, categorie: "PC de bureau", emoji: "🖥️" },
+      { id: 4, nom: "PC de bureau Dell", prix: 575000, categorie: "PC de bureau", emoji: "🖥️" },
+      { id: 5, nom: "PC de bureau Lenovo", prix: 350000, categorie: "PC de bureau", emoji: "🖥️" },
+      { id: 6, nom: "PC de bureau Dell (modèle 2)", prix: 515000, categorie: "PC de bureau", emoji: "🖥️" },
+      { id: 7, nom: "Imprimante Epson", prix: 350000, categorie: "Imprimantes", emoji: "🖨️" },
+      { id: 8, nom: "Imprimante Canon", prix: 230000, categorie: "Imprimantes", emoji: "🖨️" },
+      { id: 9, nom: "Samsung Galaxy A16", prix: 85000, categorie: "Téléphones", emoji: "📱" },
+      { id: 10, nom: "Samsung Galaxy S24 Ultra", prix: 750000, categorie: "Téléphones", emoji: "📱" },
+      { id: 11, nom: "iPhone 17 Pro Max", prix: 850000, categorie: "Téléphones", emoji: "📱" },
+      { id: 12, nom: "Tecno Camon 40", prix: 115000, categorie: "Téléphones", emoji: "📱" }
+    ];
+
+    let panier = [];
+    let categorieActive = "Tous";
+
+    const grille = document.getElementById("grille");
+    const filtres = document.getElementById("filtres");
+    const panierEl = document.getElementById("panier");
+    const listePanier = document.getElementById("liste-panier");
+    const totalEl = document.getElementById("total");
+    const compteur = document.getElementById("compteur");
+
+    function afficherFiltres() {
+      const categories = ["Tous", ...new Set(produits.map(p => p.categorie))];
+      filtres.innerHTML = "";
+      categories.forEach(cat => {
+        const b = document.createElement("button");
+        b.textContent = cat;
+        if (cat === categorieActive) b.classList.add("actif");
+        b.onclick = () => { categorieActive = cat; afficherFiltres(); afficherProduits(); };
+        filtres.appendChild(b);
+      });
+    }
+
+    function afficherProduits() {
+      grille.innerHTML = "";
+      produits
+        .filter(p => categorieActive === "Tous" || p.categorie === categorieActive)
+        .forEach(p => {
+          const carte = document.createElement("div");
+          carte.className = "carte";
+          carte.innerHTML = `
+            <div class="emoji">${p.emoji}</div>
+            <h3>${p.nom}</h3>
+            <div class="prix">${p.prix.toLocaleString("fr-FR")} FCFA</div>
+            <button onclick="ajouterAuPanier(${p.id})">Ajouter au panier</button>
+          `;
+          grille.appendChild(carte);
+        });
+    }
+
+    function ajouterAuPanier(id) {
+      const produit = produits.find(p => p.id === id);
+      const existant = panier.find(l => l.id === id);
+      if (existant) { existant.quantite++; }
+      else { panier.push({ ...produit, quantite: 1 }); }
+      afficherPanier();
+    }
+
+    function retirerDuPanier(id) {
+      panier = panier.filter(l => l.id !== id);
+      afficherPanier();
+    }
+
+    function afficherPanier() {
+      listePanier.innerHTML = "";
+      let total = 0;
+      let nombre = 0;
+      panier.forEach(l => {
+        total += l.prix * l.quantite;
+        nombre += l.quantite;
+        const ligne = document.createElement("div");
+        ligne.className = "ligne-panier";
+        ligne.innerHTML = `
+          <span>${l.nom} × ${l.quantite}</span>
+          <span>${(l.prix * l.quantite).toLocaleString("fr-FR")} FCFA
+            <button onclick="retirerDuPanier(${l.id})">X</button>
+          </span>
+        `;
+        listePanier.appendChild(ligne);
+      });
+      totalEl.textContent = "Total : " + total.toLocaleString("fr-FR") + " FCFA";
+      compteur.textContent = nombre;
+    }
+
+    document.getElementById("bouton-panier").onclick = () => panierEl.classList.add("ouvert");
+    document.getElementById("fermer").onclick = () => panierEl.classList.remove("ouvert");
+    // Numéros pour recevoir les paiements mobile money
+    const numeros = "05 74 27 43 22 ou 07 12 42 35 49";
+    const formulaire = document.getElementById("formulaire");
+    const boutonCommander = document.getElementById("commander");
+    const infoPaiement = document.getElementById("info-paiement");
+    const moyenPaiement = document.getElementById("moyen-paiement");
+
+    boutonCommander.onclick = () => {
+      if (panier.length === 0) { alert("Votre panier est vide."); return; }
+      formulaire.classList.remove("cache");
+      boutonCommander.style.display = "none";
+    };
+
+    document.getElementById("retour").onclick = () => {
+      formulaire.classList.add("cache");
+      boutonCommander.style.display = "block";
+    };
+
+    moyenPaiement.onchange = () => {
+      const m = moyenPaiement.value;
+      if (m === "") { infoPaiement.innerHTML = ""; }
+      else if (m === "Paiement à la livraison") {
+        infoPaiement.innerHTML = "Vous paierez en espèces à la réception de votre commande.";
+      } else {
+        infoPaiement.innerHTML = "Envoyez le montant total par <strong>" + m + "</strong> au : <strong>" + numeros + "</strong>. Votre commande sera livrée après confirmation du paiement.";
+      }
+    };
+
+    document.getElementById("confirmer").onclick = () => {
+      const nom = document.getElementById("nom-client").value.trim();
+      const tel = document.getElementById("tel-client").value.trim();
+      const adresse = document.getElementById("adresse-client").value.trim();
+      const m = moyenPaiement.value;
+      if (!nom || !tel || !adresse || !m) {
+        alert("Merci de remplir tous les champs et de choisir un moyen de paiement.");
+        return;
+      }
+      // Construction du message WhatsApp envoyé au vendeur
+      let message = "Nouvelle commande TechShop%0A%0A";
+      let total = 0;
+      panier.forEach(l => {
+        const sousTotal = l.prix * l.quantite;
+        total += sousTotal;
+        message += "- " + l.nom + " x" + l.quantite + " : " + sousTotal.toLocaleString("fr-FR") + " FCFA%0A";
+      });
+      message += "%0ATotal : " + total.toLocaleString("fr-FR") + " FCFA%0A%0A";
+      message += "Nom : " + nom + "%0A";
+      message += "Téléphone : " + tel + "%0A";
+      message += "Adresse : " + adresse + "%0A";
+      message += "Paiement : " + m;
+      window.open("https://wa.me/2250574274322?text=" + encodeURIComponent(decodeURIComponent(message)), "_blank");
+      alert("Merci " + nom + " ! Votre commande est envoyée sur WhatsApp. Paiement : " + m + ".");
+      panier = [];
+      afficherPanier();
+      formulaire.classList.add("cache");
+      boutonCommander.style.display = "block";
+      infoPaiement.innerHTML = "";
+      document.getElementById("nom-client").value = "";
+      document.getElementById("tel-client").value = "";
+      document.getElementById("adresse-client").value = "";
+      moyenPaiement.value = "";
+      panierEl.classList.remove("ouvert");
+    };
+
+    afficherFiltres();
+    afficherProduits();
+  </script>
+</body>
+</html>
