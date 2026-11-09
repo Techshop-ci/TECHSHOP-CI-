@@ -1,1 +1,110 @@
-
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechShop - Matériel informatique en Côte d'Ivoire</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#f2f6fc;color:#1b2a41}
+header{background:#0b5ed7;color:#fff;padding:20px;text-align:center}
+header h1{font-size:2rem}
+header p{margin-top:6px;opacity:.9}
+nav{background:#084298;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:10px}
+nav button{background:#fff;color:#0b5ed7;border:none;border-radius:20px;padding:8px 16px;font-weight:bold;cursor:pointer}
+nav button.actif{background:#ffc107;color:#1b2a41}
+main{max-width:1100px;margin:0 auto;padding:20px}
+.grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.carte{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;flex-direction:column;gap:8px}
+.carte .icone{font-size:2.5rem;text-align:center}
+.carte h3{font-size:1.05rem}
+.carte .cat{font-size:.8rem;color:#6c757d}
+.carte .prix{font-size:1.2rem;font-weight:bold;color:#0b5ed7}
+.carte button{background:#25d366;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:bold;cursor:pointer}
+.paiement{background:#fff;border-radius:12px;padding:20px;margin-top:30px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.paiement h2{color:#0b5ed7;margin-bottom:10px}
+.paiement ul{list-style:none;display:flex;flex-wrap:wrap;gap:10px}
+.paiement li{background:#e7f0ff;padding:8px 14px;border-radius:20px;font-weight:bold}
+footer{background:#084298;color:#fff;text-align:center;padding:20px;margin-top:30px;line-height:1.7}
+footer a{color:#ffc107}
+</style>
+</head>
+<body>
+<header>
+<h1>TechShop</h1>
+<p>Ordinateurs, imprimantes et téléphones - prix en FCFA</p>
+</header>
+<nav id="menu"></nav>
+<main>
+<div class="grille" id="grille"></div>
+<section class="paiement">
+<h2>Moyens de paiement</h2>
+<ul>
+<li>Orange Money</li>
+<li>Moov Money</li>
+<li>MTN Money</li>
+<li>Wave</li>
+<li>Paiement à la livraison</li>
+</ul>
+<p style="margin-top:10px">Numéros : 05 74 27 43 22 / 07 12 42 35 49</p>
+</section>
+</main>
+<footer>
+<p><strong>TechShop</strong> - Côte d'Ivoire</p>
+<p>Email : <a href="mailto:yougoneto@gmail.com">yougoneto@gmail.com</a></p>
+<p>Téléphones : 05 74 27 43 22 / 07 12 42 35 49</p>
+</footer>
+<script>
+var NUMERO_WHATSAPP="2250574274322";
+var produits=[
+{nom:"Ordinateur portable Lenovo",cat:"Ordinateurs portables",prix:250000,icone:"💻"},
+{nom:"Ordinateur portable HP",cat:"Ordinateurs portables",prix:375000,icone:"💻"},
+{nom:"PC de bureau HP",cat:"PC de bureau",prix:215000,icone:"🖥️"},
+{nom:"PC de bureau Dell",cat:"PC de bureau",prix:575000,icone:"🖥️"},
+{nom:"PC de bureau Lenovo",cat:"PC de bureau",prix:350000,icone:"🖥️"},
+{nom:"PC de bureau Dell (second modèle)",cat:"PC de bureau",prix:515000,icone:"🖥️"},
+{nom:"Imprimante Epson",cat:"Imprimantes",prix:350000,icone:"🖨️"},
+{nom:"Imprimante Canon",cat:"Imprimantes",prix:230000,icone:"🖨️"},
+{nom:"Samsung Galaxy A16",cat:"Téléphones",prix:85000,icone:"📱"},
+{nom:"Samsung Galaxy S24 Ultra",cat:"Téléphones",prix:750000,icone:"📱"},
+{nom:"iPhone 17 Pro Max",cat:"Téléphones",prix:850000,icone:"📱"},
+{nom:"Tecno Camon 40",cat:"Téléphones",prix:115000,icone:"📱"}
+];
+var categories=["Tous"];
+produits.forEach(function(p){if(categories.indexOf(p.cat)===-1)categories.push(p.cat);});
+var courante="Tous";
+function formater(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g," ")+" FCFA";}
+function commander(nom,prix){
+var msg="Bonjour TechShop, je veux commander : "+nom+" à "+formater(prix)+".";
+window.open("https://wa.me/"+NUMERO_WHATSAPP+"?text="+encodeURIComponent(msg),"_blank");
+}
+function afficherMenu(){
+var menu=document.getElementById("menu");
+menu.innerHTML="";
+categories.forEach(function(c){
+var b=document.createElement("button");
+b.textContent=c;
+if(c===courante)b.className="actif";
+b.onclick=function(){courante=c;afficherMenu();afficherProduits();};
+menu.appendChild(b);
+});
+}
+function afficherProduits(){
+var grille=document.getElementById("grille");
+grille.innerHTML="";
+produits.filter(function(p){return courante==="Tous"||p.cat===courante;}).forEach(function(p){
+var d=document.createElement("div");
+d.className="carte";
+d.innerHTML='<div class="icone">'+p.icone+'</div><h3>'+p.nom+'</h3><div class="cat">'+p.cat+'</div><div class="prix">'+formater(p.prix)+'</div>';
+var b=document.createElement("button");
+b.textContent="Commander sur WhatsApp";
+b.onclick=function(){commander(p.nom,p.prix);};
+d.appendChild(b);
+grille.appendChild(d);
+});
+}
+afficherMenu();
+afficherProduits();
+</script>
+</body>
+</html>
