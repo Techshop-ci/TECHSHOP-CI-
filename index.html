@@ -20,7 +20,7 @@ main{max-width:1100px;margin:0 auto;padding:20px}
 .carte h3{font-size:1.05rem}
 .carte .cat{font-size:.8rem;color:#6c757d}
 .carte .prix{font-size:1.2rem;font-weight:bold;color:#0b5ed7}
-.carte button{background:#25d366;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:bold;cursor:pointer}
+.carte button{background:#25d366;color:#fff;border:none;border-radius:8px;padding:10px;font-weight:bold;cursor:pointer} .carte button.fb{background:#1877f2}
 .paiement{background:#fff;border-radius:12px;padding:20px;margin-top:30px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
 .paiement h2{color:#0b5ed7;margin-bottom:10px}
 .paiement ul{list-style:none;display:flex;flex-wrap:wrap;gap:10px}
@@ -55,7 +55,7 @@ footer a{color:#ffc107}
 <p>Téléphones : 05 74 27 43 22 / 07 12 42 35 49</p>
 </footer>
 <script>
-var NUMERO_WHATSAPP="2250574274322";
+var NUMERO_WHATSAPP="2250574274322"; var LIEN_FACEBOOK="https://www.facebook.com/adolphe.yougone";
 var produits=[
 {nom:"Ordinateur portable Lenovo",cat:"Ordinateurs portables",prix:250000,icone:"💻"},
 {nom:"Ordinateur portable HP",cat:"Ordinateurs portables",prix:375000,icone:"💻"},
@@ -99,7 +99,7 @@ d.innerHTML='<div class="icone">'+p.icone+'</div><h3>'+p.nom+'</h3><div class="c
 var b=document.createElement("button");
 b.textContent="Commander sur WhatsApp";
 b.onclick=function(){commander(p.nom,p.prix);};
-d.appendChild(b);
+d.appendChild(b); var f=document.createElement("button"); f.textContent="Commander sur Facebook"; f.className="fb"; f.onclick=function(){window.open(LIEN_FACEBOOK,"_blank");}; d.appendChild(f);
 grille.appendChild(d);
 });
 }
